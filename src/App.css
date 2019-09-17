@@ -1,33 +1,92 @@
-.App {
-  text-align: center;
+* {
+  font-size: 1rem;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+input {
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+::placeholder {
+  color: #cccccc;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body,
+input {
+  background-color: #022c43;
+}
+
+.app {
+  margin: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 90vw;
+  padding: 1rem;
+  border: 4px solid #053f5e;
+}
+
+.sourceUrl {
+  padding: 4px;
+}
+.sourceUrl input {
+  background-color: #053f5e;
+}
+
+input {
+  padding: 8px 8px;
+  border: 0;
+  border-bottom: 1px solid black;
+}
+
+.sourceUrl input {
+  width: calc(100% - 16px);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+  padding: 4px;
+}
+
+.column ul {
+  list-style: none;
+  margin: 0;
+  padding: 1rem 0;
+}
+
+.column ul li button {
+  background-color: #115173;
+  border: 0;
+  padding: 8px 8px;
+  color: #eeeeee;
+  border-bottom: 1px solid #053f5e;
+  margin-bottom: 2px;
+  cursor: pointer;
+}
+
+.column ul li button.selected {
+  font-weight: bold;
+  color: black;
+  background-color: #ffd700;
+}
+
+.column ul li a,
+.column ul li span {
+  color: white;
+  padding: 4px 8px;
+  display: block;
+  cursor: pointer;
+}
+
+.column ul li a:hover,
+.column ul li span:hover {
+  color: red;
 }
