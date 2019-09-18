@@ -4,7 +4,8 @@ const LinkNode: React.SFC<{ text: string; link: string }> = ({
   text,
   link
 }) => (
-  <a href={link} title={link}>
+  // eslint-disable-next-line
+  <a className="link" href={link} title={link} target="_blank">
     {text}
   </a>
 );

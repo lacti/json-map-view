@@ -78,15 +78,26 @@ input {
   background-color: #ffd700;
 }
 
-.column ul li a,
-.column ul li span {
+.column ul li button.selected span.count {
+  color: black;
+}
+
+.column ul li a.link,
+.column ul li span.link {
   color: white;
   padding: 4px 8px;
   display: block;
   cursor: pointer;
 }
 
-.column ul li a:hover,
-.column ul li span:hover {
+.column ul li span.count {
+  display: inline;
+  font-size: 0.8rem;
+  color: #dddddd;
+  padding: 4px;
+}
+
+.column ul li a.link:hover,
+.column ul li span.link:hover {
   color: red;
 }

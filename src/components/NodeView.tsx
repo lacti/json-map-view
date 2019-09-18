@@ -9,19 +9,26 @@ const NodeView: React.SFC<{
   onNodeKeySelected: (nodeKey: string) => void;
 }> = ({ model, selectedNodeKey, onNodeKeySelected }) => (
   <ul>
-    {Object.keys(model).map(nodeKey => (
-      <li key={nodeKey}>
-        {typeof model[nodeKey] === "string" ? (
-          <TerminalNode text={nodeKey} value={model[nodeKey] as string} />
-        ) : (
+    {Object.entries(model)
+      .filter(([, nodeValue]) => typeof nodeValue !== "string")
+      .sort((a, b) => Object.keys(b[1]).length - Object.keys(a[1]).length)
+      .map(([nodeKey, nodeValue]) => (
+        <li key={nodeKey}>
           <NonTerminalNode
             nodeKey={nodeKey}
+            nodeValue={nodeValue as IMapNode}
             selectedNodeKey={selectedNodeKey}
             onNodeKeySelected={onNodeKeySelected}
           />
-        )}
-      </li>
-    ))}
+        </li>
+      ))}
+    {Object.entries(model)
+      .filter(([, nodeValue]) => typeof nodeValue === "string")
+      .map(([nodeKey, nodeValue]) => (
+        <li key={nodeKey}>
+          <TerminalNode text={nodeKey} value={nodeValue as string} />
+        </li>
+      ))}
   </ul>
 );
 

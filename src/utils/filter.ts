@@ -13,7 +13,11 @@ export const applyFilterFrom = (filters: Array<string | null>) => (
   }
   const result: IMapNode = {};
   for (const nodeKey of Object.keys(node)) {
-    if (nodeKey.includes(condition)) {
+    if (
+      nodeKey.includes(condition) ||
+      (typeof node[nodeKey] !== "string" &&
+        Object.keys(node[nodeKey]).some(each => each.includes(condition)))
+    ) {
       result[nodeKey] = node[nodeKey];
     }
   }
