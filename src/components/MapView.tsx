@@ -8,13 +8,13 @@ import { updateFiltersFrom } from "../utils/filter";
 const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
   const newNullArray = () => Array(headers.length).fill(null);
   const [selectedNodeKeys, setSelectedNodeKeys] = useState<
-    Array<string | null>
+    Array<string[] | null>
   >(newNullArray());
   const [filters, setFilters] = useState<Array<string | null>>(newNullArray());
 
   const getNode = getNodeFrom(body, selectedNodeKeys, filters);
   const updateFilters = updateFiltersFrom(filters);
-  const updateSelectedNodeKeys = updateSelectedNodeKeysFrom(selectedNodeKeys);
+  const toggleSelectedNodeKey = updateSelectedNodeKeysFrom(selectedNodeKeys);
   return (
     <div className="row">
       {headers.map((header, level) => {
@@ -29,15 +29,13 @@ const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
                 )
               }
             />
-            {model && (
-              <NodeView
-                model={model}
-                selectedNodeKey={selectedNodeKeys[level]}
-                onNodeKeySelected={newNodeKey =>
-                  setSelectedNodeKeys(updateSelectedNodeKeys(level, newNodeKey))
-                }
-              />
-            )}
+            <NodeView
+              model={model}
+              selectedNodeKeys={selectedNodeKeys[level]}
+              onNodeKeyToggled={nodeKey =>
+                setSelectedNodeKeys(toggleSelectedNodeKey(level, nodeKey))
+              }
+            />
           </div>
         );
       })}

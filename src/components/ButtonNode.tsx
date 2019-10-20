@@ -4,9 +4,9 @@ import { IMapNode } from "../models/node";
 const ButtonNode: React.SFC<{
   nodeKey: string;
   nodeValue: IMapNode;
-  onNodeKeySelected: (nodeKey: string) => void;
-}> = ({ nodeKey, nodeValue, onNodeKeySelected }) => (
-  <button onClick={() => onNodeKeySelected(nodeKey)}>
+  onNodeKeyToggled: (nodeKey: string) => void;
+}> = ({ nodeKey, nodeValue, onNodeKeyToggled }) => (
+  <button onClick={() => onNodeKeyToggled(nodeKey)}>
     {nodeKey}
     <span className="count">({Object.keys(nodeValue).length})</span>
   </button>

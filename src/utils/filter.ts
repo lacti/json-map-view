@@ -3,9 +3,9 @@ import { IMapNode } from "../models/node";
 export const applyFilterFrom = (filters: Array<string | null>) => (
   node: IMapNode,
   level: number
-) => {
+): IMapNode => {
   if (!node) {
-    return node;
+    return {} as IMapNode;
   }
   const condition = filters[level];
   if (!condition) {

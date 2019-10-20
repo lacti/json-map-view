@@ -5,25 +5,26 @@ import { IMapNode } from "../models/node";
 
 const NodeView: React.SFC<{
   model: IMapNode;
-  selectedNodeKey: string | null;
-  onNodeKeySelected: (nodeKey: string) => void;
-}> = ({ model, selectedNodeKey, onNodeKeySelected }) => (
+  selectedNodeKeys: string[] | null;
+  onNodeKeyToggled: (nodeKey: string) => void;
+}> = ({ model, selectedNodeKeys, onNodeKeyToggled }) => (
   <ul>
     {Object.entries(model)
       .filter(([, nodeValue]) => typeof nodeValue !== "string")
-      .sort((a, b) => Object.keys(b[1]).length - Object.keys(a[1]).length)
+      .sort(compare)
       .map(([nodeKey, nodeValue]) => (
         <li key={nodeKey}>
           <NonTerminalNode
             nodeKey={nodeKey}
             nodeValue={nodeValue as IMapNode}
-            selectedNodeKey={selectedNodeKey}
-            onNodeKeySelected={onNodeKeySelected}
+            selectedNodeKeys={selectedNodeKeys}
+            onNodeKeyToggled={onNodeKeyToggled}
           />
         </li>
       ))}
     {Object.entries(model)
       .filter(([, nodeValue]) => typeof nodeValue === "string")
+      .sort(compare)
       .map(([nodeKey, nodeValue]) => (
         <li key={nodeKey}>
           <TerminalNode text={nodeKey} value={nodeValue as string} />
@@ -31,5 +32,14 @@ const NodeView: React.SFC<{
       ))}
   </ul>
 );
+
+type NodeValue = string | IMapNode;
+type NodeEntry = [string, NodeValue];
+const compare = (a: NodeEntry, b: NodeEntry) =>
+  typeof a[1] === 'string'
+    ? a[0].localeCompare(b[0])
+    : count(b[1]) - count(a[1])
+
+const count = (node: NodeValue) => typeof node === 'string' ? node.length : Object.keys(node).length;
 
 export default NodeView;

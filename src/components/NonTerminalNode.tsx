@@ -6,13 +6,13 @@ import { IMapNode } from "../models/node";
 const NonTerminalNode: React.SFC<{
   nodeKey: string;
   nodeValue: IMapNode;
-  selectedNodeKey: string | null;
-  onNodeKeySelected: (nodeKey: string) => void;
-}> = ({ nodeKey, nodeValue, selectedNodeKey, onNodeKeySelected }) =>
-  selectedNodeKey === nodeKey ? (
-    <SelectedButtonNode nodeKey={nodeKey} nodeValue={nodeValue} />
-  ) : (
-    <ButtonNode nodeKey={nodeKey} nodeValue={nodeValue} onNodeKeySelected={onNodeKeySelected} />
-  );
+  selectedNodeKeys: string[] | null;
+  onNodeKeyToggled: (nodeKey: string) => void;
+}> = ({ nodeKey, nodeValue, selectedNodeKeys, onNodeKeyToggled }) =>
+    !!selectedNodeKeys && selectedNodeKeys.includes(nodeKey) ? (
+      <SelectedButtonNode nodeKey={nodeKey} nodeValue={nodeValue} onNodeKeyToggled={onNodeKeyToggled} />
+    ) : (
+        <ButtonNode nodeKey={nodeKey} nodeValue={nodeValue} onNodeKeyToggled={onNodeKeyToggled} />
+      );
 
 export default NonTerminalNode;
