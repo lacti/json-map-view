@@ -19,8 +19,13 @@ const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
     <div className="row">
       {headers.map((header, level) => {
         const model = getNode(level);
+        const selectedNodeKeysOfCurrentLevel = selectedNodeKeys[level];
+        const hasSelected =
+          selectedNodeKeysOfCurrentLevel !== null &&
+          selectedNodeKeysOfCurrentLevel.length > 0;
+        const className = hasSelected ? `column selected` : `column`;
         return (
-          <div key={header} className="column">
+          <div key={header} className={className}>
             <FilterHeader
               placeholder={header}
               onKeyUp={event =>
@@ -31,7 +36,7 @@ const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
             />
             <NodeView
               model={model}
-              selectedNodeKeys={selectedNodeKeys[level]}
+              selectedNodeKeys={selectedNodeKeysOfCurrentLevel}
               onNodeKeyToggled={nodeKey =>
                 setSelectedNodeKeys(toggleSelectedNodeKey(level, nodeKey))
               }
