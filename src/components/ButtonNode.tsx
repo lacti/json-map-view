@@ -1,5 +1,6 @@
 import React from "react";
 import { IMapNode } from "../models/node";
+import NodeKey from "./NodeKey";
 
 const ButtonNode: React.SFC<{
   nodeKey: string;
@@ -12,7 +13,7 @@ const ButtonNode: React.SFC<{
       onClick={() => onNodeKeyToggled(nodeKey)}
       title={`${nodeKey} (${countOfChildren})`}
     >
-      {nodeKey}
+      <NodeKey nodeKey={nodeKey} />
       <span className="count">({countOfChildren})</span>
     </button>
   );

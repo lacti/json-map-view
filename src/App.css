@@ -1,5 +1,5 @@
 * {
-  font-size: 1rem;
+  font-size: 0.93rem;
 }
 
 input {
@@ -83,6 +83,7 @@ input {
   border-bottom: 1px solid #053f5e;
   margin-bottom: 2px;
   cursor: pointer;
+  text-align: left;
 }
 
 .column ul li button.selected {
@@ -93,6 +94,27 @@ input {
 
 .column ul li button.selected span.count {
   color: black;
+}
+
+.column ul li button span.node-text:nth-last-child(2) {
+  font-size: 0.93rem;
+  background-color: transparent;
+}
+.column ul li button span.node-text {
+  font-size: 0.85rem;
+  background-color: #053f5e;
+  padding-right: 4px;
+}
+.column ul li button.selected span.node-text:nth-last-child(2) {
+  font-size: 0.93rem;
+  font-weight: bold;
+  background-color: transparent;
+}
+.column ul li button.selected span.node-text {
+  font-size: 0.85rem;
+  padding-right: 4px;
+  font-weight: normal;
+  background-color: transparent;
 }
 
 .column ul li a.link,
@@ -119,6 +141,10 @@ input {
   padding: 4px 6px;
   font-size: 0.7rem;
   background-color: #053f5e;
+}
+
+.column ul li a.link span.reference:nth-child(even) {
+  background-color: #115173;
 }
 
 .column ul li span.count {

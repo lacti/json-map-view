@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { IMap } from "../models/map";
-import { getNodeFrom, updateSelectedNodeKeysFrom } from "../utils/node";
+import {
+  getNodeFrom,
+  updateSelectedNodeKeysFrom,
+  toggleAllSelectedNodeKeysFrom
+} from "../utils/node";
 import FilterHeader from "./FilterHeader";
 import NodeView from "./NodeView";
 import { updateFiltersFrom } from "../utils/filter";
@@ -15,6 +19,9 @@ const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
   const getNode = getNodeFrom(body, selectedNodeKeys, filters);
   const updateFilters = updateFiltersFrom(filters);
   const toggleSelectedNodeKey = updateSelectedNodeKeysFrom(selectedNodeKeys);
+  const toggleSelectedNodeKeys = toggleAllSelectedNodeKeysFrom(
+    selectedNodeKeys
+  );
   return (
     <div className="row">
       {headers.map((header, level) => {
@@ -25,7 +32,13 @@ const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
           selectedNodeKeysOfCurrentLevel.length > 0;
         const className = hasSelected ? `column selected` : `column`;
         return (
-          <div key={header} className={className}>
+          <div
+            key={header}
+            className={className}
+            onDoubleClick={() =>
+              setSelectedNodeKeys(toggleSelectedNodeKeys(level, model))
+            }
+          >
             <FilterHeader
               placeholder={header}
               onKeyUp={event =>
