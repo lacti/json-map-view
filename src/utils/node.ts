@@ -91,11 +91,13 @@ const unique = <T>(values?: T[]) => [...new Set(values || [])];
 
 export const toggleAllSelectedNodeKeysFrom = (
   selectedNodeKeys: Array<string[] | null>
-) => (level: number, model: IMapNode) =>
+) => (level: number, model: IMapNode, selected: boolean) =>
   selectedNodeKeys.map((old, index) =>
     index !== level
-      ? old
-      : old != null && old.length > 0
-      ? null
-      : Object.keys(model)
+      ? index < level
+        ? old
+        : null
+      : selected
+      ? Object.keys(model)
+      : null
   );

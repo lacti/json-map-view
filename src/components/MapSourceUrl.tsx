@@ -1,6 +1,6 @@
 import React from "react";
 
-const MapSourceUrl: React.SFC<{
+const MapSourceUrl: React.FC<{
   url: string | null;
   setUrl: (newUrl: string) => void;
 }> = ({ url, setUrl }) => (

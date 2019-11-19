@@ -2,7 +2,7 @@ import React from "react";
 import { IMapNode } from "../models/node";
 import NodeKey from "./NodeKey";
 
-const SelectedButtonNode: React.SFC<{
+const SelectedButtonNode: React.FC<{
   nodeKey: string;
   nodeValue: IMapNode;
   onNodeKeyToggled: (nodeKey: string) => void;

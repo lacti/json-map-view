@@ -3,7 +3,7 @@ import NonTerminalNode from "./NonTerminalNode";
 import TerminalNode from "./TerminalNode";
 import { IMapNode } from "../models/node";
 
-const NodeView: React.SFC<{
+const NodeView: React.FC<{
   model: IMapNode;
   selectedNodeKeys: string[] | null;
   onNodeKeyToggled: (nodeKey: string) => void;
@@ -36,10 +36,11 @@ const NodeView: React.SFC<{
 type NodeValue = string | IMapNode;
 type NodeEntry = [string, NodeValue];
 const compare = (a: NodeEntry, b: NodeEntry) =>
-  typeof a[1] === 'string'
+  typeof a[1] === "string"
     ? a[0].localeCompare(b[0])
-    : count(b[1]) - count(a[1])
+    : count(b[1]) - count(a[1]);
 
-const count = (node: NodeValue) => typeof node === 'string' ? node.length : Object.keys(node).length;
+const count = (node: NodeValue) =>
+  typeof node === "string" ? node.length : Object.keys(node).length;
 
 export default NodeView;

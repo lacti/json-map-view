@@ -5,7 +5,7 @@ import { IMap } from "./models/map";
 import MapSourceUrl from "./components/MapSourceUrl";
 import { getMapUrlFromQueryString } from "./utils/parameter";
 
-const App: React.SFC = () => {
+const App: React.FC = () => {
   const [url, setUrl] = useState<string | null>(getMapUrlFromQueryString());
   const [map, setMap] = useState<IMap | null>(null);
   useEffect(() => {

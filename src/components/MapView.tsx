@@ -1,4 +1,6 @@
+import copy from "clipboard-copy";
 import React, { useState } from "react";
+import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
 import { IMap } from "../models/map";
 import {
   getNodeFrom,
@@ -8,13 +10,40 @@ import {
 import FilterHeader from "./FilterHeader";
 import NodeView from "./NodeView";
 import { updateFiltersFrom } from "../utils/filter";
+import { gotoShareUrl, getStateFromUrl } from "../utils/share";
 
-const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
+interface IMapViewState {
+  selectedNodeKeys: Array<string[] | null>;
+  filters: Array<string | null>;
+}
+
+const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
   const newNullArray = () => Array(headers.length).fill(null);
+  const stateFromUrl = getStateFromUrl<IMapViewState>();
   const [selectedNodeKeys, setSelectedNodeKeys] = useState<
     Array<string[] | null>
-  >(newNullArray());
-  const [filters, setFilters] = useState<Array<string | null>>(newNullArray());
+  >(stateFromUrl ? stateFromUrl.selectedNodeKeys : newNullArray());
+  const [filters, setFilters] = useState<Array<string | null>>(
+    stateFromUrl ? stateFromUrl.filters : newNullArray()
+  );
+
+  const setSelectedNodeKeysWithState = (
+    selectedNodeKeys: IMapViewState["selectedNodeKeys"]
+  ) => {
+    gotoShareUrl<IMapViewState>({ selectedNodeKeys, filters });
+    return setSelectedNodeKeys(selectedNodeKeys);
+  };
+
+  const setFiltersWithState = (filters: IMapViewState["filters"]) => {
+    gotoShareUrl<IMapViewState>({ selectedNodeKeys, filters });
+    return setFilters(filters);
+  };
+
+  const shareUrl = () => {
+    gotoShareUrl<IMapViewState>({ selectedNodeKeys, filters });
+    copy(window.location.href);
+    alert(`URL copied!\n` + window.location.href);
+  };
 
   const getNode = getNodeFrom(body, selectedNodeKeys, filters);
   const updateFilters = updateFiltersFrom(filters);
@@ -31,29 +60,44 @@ const MapView: React.SFC<{ map: IMap }> = ({ map: { headers, body } }) => {
           selectedNodeKeysOfCurrentLevel !== null &&
           selectedNodeKeysOfCurrentLevel.length > 0;
         const className = hasSelected ? `column selected` : `column`;
+        const toggleAll = (selected: boolean) =>
+          setSelectedNodeKeysWithState(
+            toggleSelectedNodeKeys(level, model, selected)
+          );
         return (
-          <div
-            key={header}
-            className={className}
-            onDoubleClick={() =>
-              setSelectedNodeKeys(toggleSelectedNodeKeys(level, model))
-            }
-          >
+          <div key={header} className={className}>
             <FilterHeader
               placeholder={header}
               onKeyUp={event =>
-                setFilters(
+                setFiltersWithState(
                   updateFilters(level, (event.target as HTMLInputElement).value)
                 )
               }
             />
-            <NodeView
-              model={model}
-              selectedNodeKeys={selectedNodeKeysOfCurrentLevel}
-              onNodeKeyToggled={nodeKey =>
-                setSelectedNodeKeys(toggleSelectedNodeKey(level, nodeKey))
-              }
-            />
+            <ContextMenuTrigger id={`ToggleMenu-${header}`}>
+              <NodeView
+                model={model}
+                selectedNodeKeys={selectedNodeKeysOfCurrentLevel}
+                onNodeKeyToggled={nodeKey =>
+                  setSelectedNodeKeysWithState(
+                    toggleSelectedNodeKey(level, nodeKey)
+                  )
+                }
+              />
+            </ContextMenuTrigger>
+            <ContextMenu id={`ToggleMenu-${header}`}>
+              {level < headers.length - 1 && (
+                <React.Fragment>
+                  <MenuItem onClick={() => toggleAll(true)}>
+                    Select all
+                  </MenuItem>
+                  <MenuItem onClick={() => toggleAll(false)}>
+                    Deselect all
+                  </MenuItem>
+                </React.Fragment>
+              )}
+              <MenuItem onClick={shareUrl}>Copy this URL</MenuItem>
+            </ContextMenu>
           </div>
         );
       })}

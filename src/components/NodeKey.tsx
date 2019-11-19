@@ -1,6 +1,6 @@
 import React from "react";
 
-const NodeKey: React.SFC<{
+const NodeKey: React.FC<{
   nodeKey: string;
 }> = ({ nodeKey }) => (
   <React.Fragment>

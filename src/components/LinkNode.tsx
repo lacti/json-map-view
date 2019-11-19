@@ -1,10 +1,7 @@
 import React from "react";
 import { nodeNameDelimiter } from "../utils/node";
 
-const LinkNode: React.SFC<{ text: string; link: string }> = ({
-  text,
-  link
-}) => (
+const LinkNode: React.FC<{ text: string; link: string }> = ({ text, link }) => (
   // eslint-disable-next-line
   <a className="link" href={link} title={link} target="_blank">
     <span className="text">{name(text)}</span>

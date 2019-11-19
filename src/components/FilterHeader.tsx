@@ -1,6 +1,6 @@
 import React from "react";
 
-const FilterHeader: React.SFC<{
+const FilterHeader: React.FC<{
   placeholder?: string;
   onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
 }> = ({ placeholder, onKeyUp }) => (
