@@ -20,6 +20,7 @@ interface IMapViewState {
 const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
   const newNullArray = () => Array(headers.length).fill(null);
   const stateFromUrl = getStateFromUrl<IMapViewState>();
+  console.log(stateFromUrl);
   const [selectedNodeKeys, setSelectedNodeKeys] = useState<
     Array<string[] | null>
   >(stateFromUrl ? stateFromUrl.selectedNodeKeys : newNullArray());
@@ -68,6 +69,7 @@ const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
           <div key={header} className={className}>
             <FilterHeader
               placeholder={header}
+              value={filters[level]}
               onKeyUp={event =>
                 setFiltersWithState(
                   updateFilters(level, (event.target as HTMLInputElement).value)
