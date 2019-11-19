@@ -18,6 +18,9 @@ export const applyFilterFrom = (filters: Array<string | null>) => (
         result[nodeKey] = node[nodeKey];
       }
     }
+    if (Object.keys(result).length === 0) {
+      return node;
+    }
     return result;
   }
   return node;
