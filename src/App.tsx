@@ -11,12 +11,12 @@ import { useStateFromUrl } from "./utils/share";
 import { viewStateStore } from "./utils/state";
 
 const App: React.FC = () => {
-  const [url, setUrl] = useState<string | null>(getMapUrlFromQueryString());
   const [map, setMap] = useState<IMap | null>(null);
 
   const [viewState, setViewState] = useStateFromUrl<IViewState>();
   const useViewState = viewStateStore(viewState, setViewState);
   const [query, setQuery] = useViewState("query", () => "");
+  const [url, setUrl] = useViewState("mapUrl", getMapUrlFromQueryString);
 
   const [debouncedQuery] = useDebouncedCallback(
     (newQuery: string) => setQuery(newQuery),
