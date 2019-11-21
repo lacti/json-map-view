@@ -62,7 +62,8 @@ input {
 }
 
 .column.selected {
-  width: 18rem;
+  width: auto;
+  max-width: 24rem;
   flex: none;
 }
 
@@ -195,6 +196,7 @@ input {
   pointer-events: none;
   text-align: left;
   transition: opacity 250ms ease !important;
+  user-select: none;
 }
 
 .react-contextmenu.react-contextmenu--visible {
