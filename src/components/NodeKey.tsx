@@ -11,7 +11,6 @@ const NodeKey: React.FC<{
         </span>
       ) : (
         <React.Fragment key={index}>
-          <br />
           <span className="node-text">{nodeKeyText}</span>
         </React.Fragment>
       )
