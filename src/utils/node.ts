@@ -1,35 +1,48 @@
 import { IMapNode } from "../models/node";
-import { applyFilterFrom } from "./filter";
+import { applyFilter } from "./filter";
+import { unique } from "./collection";
+import { applyQuery } from "./query";
 
 export const nodeNameDelimiter = "$$";
 
 export const getNodeFrom = (
   root: IMapNode,
   allOfSelectedNodeKeys: Array<string[] | null>,
-  filters: Array<string | null>
+  filters: Array<string | null>,
+  query: string | null,
+  skipReferenceLevel: number
 ) => {
-  const applyFilter = applyFilterFrom(filters);
-  return (level: number): IMapNode => {
-    let node: IMapNode = applyFilter(root, 0);
-    for (let i = 0; i < level; i++) {
-      const selectedNodeKeys = allOfSelectedNodeKeys[i];
-      if (!selectedNodeKeys) {
-        return {};
-      }
-      node = applyFilter(selectAndMergeNodes(node, selectedNodeKeys), i + 1);
-      if (!node) {
-        return {};
-      }
-    }
-    return node;
+  const queriedRoot = applyQuery(root, query);
+  const leveledNodes: { [level: number]: IMapNode } = {
+    0: applyFilter(queriedRoot, filters[0])
   };
+
+  for (let level = 1; level < allOfSelectedNodeKeys.length; level++) {
+    const selectedParentNodeKeys = allOfSelectedNodeKeys[level - 1];
+    if (selectedParentNodeKeys === null) {
+      break;
+    }
+    leveledNodes[level] = applyFilter(
+      selectAndMergeNodes(
+        leveledNodes[level - 1],
+        selectedParentNodeKeys,
+        level < skipReferenceLevel + 1
+      ),
+      filters[level]
+    );
+  }
+  return (level: number): IMapNode => leveledNodes[level] || {};
 };
 
-const selectAndMergeNodes = (node: IMapNode, selectedNodeKeys: string[]) =>
+const selectAndMergeNodes = (
+  node: IMapNode,
+  selectedNodeKeys: string[],
+  skipReference: boolean
+) =>
   mergeNodes(
     selectedNodeKeys
       .filter(key => !!node && !!node[key])
-      .map(key => [key, node![key] as IMapNode]),
+      .map(key => [!skipReference ? key : "", node![key] as IMapNode]),
     selectedNodeKeys.length > 1
   );
 
@@ -85,9 +98,7 @@ export const mergeNodes = (
 };
 
 const buildNewKey = (key: string, reference: string) =>
-  [key, reference].join(nodeNameDelimiter);
-
-const unique = <T>(values?: T[]) => [...new Set(values || [])];
+  !reference ? key : [key, reference].join(nodeNameDelimiter);
 
 export const toggleAllSelectedNodeKeysFrom = (
   selectedNodeKeys: Array<string[] | null>

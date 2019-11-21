@@ -1,46 +1,27 @@
 import { IMapNode } from "../models/node";
 
-export const applyFilterFrom = (filters: Array<string | null>) => (
-  node: IMapNode,
-  currentLevel: number
-): IMapNode => {
-  if (!node) {
-    return {} as IMapNode;
+export const applyFilter = (node: IMapNode, filter: string | null) => {
+  if (!filter) {
+    return node;
   }
-  for (let level = currentLevel; level >= 0; --level) {
-    const condition = filters[level];
-    if (!condition) {
-      continue;
+  const effectiveFilter = filter.toLowerCase();
+  const filtered: IMapNode = {};
+  for (const [key, value] of Object.entries(node)) {
+    if (acceptable(key, value, effectiveFilter)) {
+      filtered[key] = value;
     }
-    const result: IMapNode = {};
-    for (const nodeKey of Object.keys(node)) {
-      if (includes(node, nodeKey, condition)) {
-        result[nodeKey] = node[nodeKey];
-      }
-    }
-    if (Object.keys(result).length === 0) {
-      return node;
-    }
-    return result;
   }
-  return node;
+  return filtered;
 };
 
-const includes = (
-  node: IMapNode,
-  nodeKey: string,
-  condition: string
-): boolean => {
-  if (nodeKey.toLowerCase().includes(condition.toLowerCase())) {
+const acceptable = (key: string, value: string | IMapNode, filter: string) => {
+  if (key.toLowerCase().includes(filter)) {
     return true;
   }
-  if (typeof node[nodeKey] !== "string") {
-    const childNode = node[nodeKey] as IMapNode;
-    for (const childNodeKey of Object.keys(childNode)) {
-      if (includes(childNode, childNodeKey, condition)) {
-        return true;
-      }
-    }
+  if (typeof value !== "string") {
+    return Object.keys(value).some(childKey =>
+      childKey.toLowerCase().includes(filter)
+    );
   }
   return false;
 };

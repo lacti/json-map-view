@@ -1,6 +1,12 @@
 import copy from "clipboard-copy";
-import React, { useState } from "react";
-import { ContextMenu, ContextMenuTrigger, MenuItem } from "react-contextmenu";
+import React from "react";
+import {
+  ContextMenu,
+  ContextMenuTrigger,
+  MenuItem,
+  SubMenu
+} from "react-contextmenu";
+import { useDebouncedCallback } from "use-debounce";
 import { IMap } from "../models/map";
 import {
   getNodeFrom,
@@ -10,43 +16,44 @@ import {
 import FilterHeader from "./FilterHeader";
 import NodeView from "./NodeView";
 import { updateFiltersFrom } from "../utils/filter";
-import { gotoShareUrl, getStateFromUrl } from "../utils/share";
+import { IViewState } from "../models/state";
+import { viewStateStore } from "../utils/state";
 
-interface IMapViewState {
-  selectedNodeKeys: Array<string[] | null>;
-  filters: Array<string | null>;
-}
-
-const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
+const MapView: React.FC<{
+  map: IMap;
+  viewState: IViewState | null;
+  setViewState: (newState: Partial<IViewState>) => void;
+}> = ({ map: { headers, body }, viewState, setViewState }) => {
+  const useViewState = viewStateStore(viewState, setViewState);
   const newNullArray = () => Array(headers.length).fill(null);
-  const stateFromUrl = getStateFromUrl<IMapViewState>();
-  console.log(stateFromUrl);
-  const [selectedNodeKeys, setSelectedNodeKeys] = useState<
-    Array<string[] | null>
-  >(stateFromUrl ? stateFromUrl.selectedNodeKeys : newNullArray());
-  const [filters, setFilters] = useState<Array<string | null>>(
-    stateFromUrl ? stateFromUrl.filters : newNullArray()
+  const [selectedNodeKeys, setSelectedNodeKeys] = useViewState(
+    "selectedNodeKeys",
+    newNullArray
+  );
+  const [filters, setFilters] = useViewState("filters", newNullArray);
+  const [skipReferenceLevel, setSkipReferenceLevel] = useViewState(
+    "skipReferenceLevel",
+    () => 0
   );
 
-  const setSelectedNodeKeysWithState = (
-    selectedNodeKeys: IMapViewState["selectedNodeKeys"]
-  ) => {
-    gotoShareUrl<IMapViewState>({ selectedNodeKeys, filters });
-    return setSelectedNodeKeys(selectedNodeKeys);
-  };
-
-  const setFiltersWithState = (filters: IMapViewState["filters"]) => {
-    gotoShareUrl<IMapViewState>({ selectedNodeKeys, filters });
-    return setFilters(filters);
-  };
+  const [debouncedFilter] = useDebouncedCallback(
+    ({ level, value }: { level: number; value: string }) =>
+      setFilters(updateFilters(level, value)),
+    100
+  );
 
   const shareUrl = () => {
-    gotoShareUrl<IMapViewState>({ selectedNodeKeys, filters });
     copy(window.location.href);
     alert(`URL copied!\n` + window.location.href);
   };
 
-  const getNode = getNodeFrom(body, selectedNodeKeys, filters);
+  const getNode = getNodeFrom(
+    body,
+    selectedNodeKeys,
+    filters,
+    viewState ? viewState.query : null,
+    skipReferenceLevel
+  );
   const updateFilters = updateFiltersFrom(filters);
   const toggleSelectedNodeKey = updateSelectedNodeKeysFrom(selectedNodeKeys);
   const toggleSelectedNodeKeys = toggleAllSelectedNodeKeysFrom(
@@ -62,18 +69,17 @@ const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
           selectedNodeKeysOfCurrentLevel.length > 0;
         const className = hasSelected ? `column selected` : `column`;
         const toggleAll = (selected: boolean) =>
-          setSelectedNodeKeysWithState(
-            toggleSelectedNodeKeys(level, model, selected)
-          );
+          setSelectedNodeKeys(toggleSelectedNodeKeys(level, model, selected));
         return (
           <div key={header} className={className}>
             <FilterHeader
               placeholder={header}
               value={filters[level]}
               onKeyUp={event =>
-                setFiltersWithState(
-                  updateFilters(level, (event.target as HTMLInputElement).value)
-                )
+                debouncedFilter({
+                  level,
+                  value: (event.target as HTMLInputElement).value
+                })
               }
             />
             <ContextMenuTrigger id={`ToggleMenu-${header}`}>
@@ -81,9 +87,7 @@ const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
                 model={model}
                 selectedNodeKeys={selectedNodeKeysOfCurrentLevel}
                 onNodeKeyToggled={nodeKey =>
-                  setSelectedNodeKeysWithState(
-                    toggleSelectedNodeKey(level, nodeKey)
-                  )
+                  setSelectedNodeKeys(toggleSelectedNodeKey(level, nodeKey))
                 }
               />
             </ContextMenuTrigger>
@@ -99,6 +103,21 @@ const MapView: React.FC<{ map: IMap }> = ({ map: { headers, body } }) => {
                 </React.Fragment>
               )}
               <MenuItem onClick={shareUrl}>Copy this URL</MenuItem>
+              {level === headers.length - 1 && (
+                <SubMenu title="Skip Reference Level">
+                  {Array(headers.length - 1)
+                    .fill(0)
+                    .map((_, index) => (
+                      <MenuItem
+                        key={`skipRefLevel_${index}`}
+                        disabled={skipReferenceLevel === index}
+                        onClick={() => setSkipReferenceLevel(index)}
+                      >
+                        {index}
+                      </MenuItem>
+                    ))}
+                </SubMenu>
+              )}
             </ContextMenu>
           </div>
         );

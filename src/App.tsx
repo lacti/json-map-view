@@ -1,13 +1,28 @@
 import React, { useState, useEffect } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import "./App.css";
 import MapView from "./components/MapView";
 import { IMap } from "./models/map";
 import MapSourceUrl from "./components/MapSourceUrl";
 import { getMapUrlFromQueryString } from "./utils/parameter";
+import QueryHeader from "./components/QueryHeader";
+import { IViewState } from "./models/state";
+import { useStateFromUrl } from "./utils/share";
+import { viewStateStore } from "./utils/state";
 
 const App: React.FC = () => {
   const [url, setUrl] = useState<string | null>(getMapUrlFromQueryString());
   const [map, setMap] = useState<IMap | null>(null);
+
+  const [viewState, setViewState] = useStateFromUrl<IViewState>();
+  const useViewState = viewStateStore(viewState, setViewState);
+  const [query, setQuery] = useViewState("query", () => "");
+
+  const [debouncedQuery] = useDebouncedCallback(
+    (newQuery: string) => setQuery(newQuery),
+    200
+  );
+
   useEffect(() => {
     if (url) {
       fetch(url)
@@ -23,7 +38,18 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <MapSourceUrl url={url} setUrl={setUrl} />
-      {map && <MapView map={map} />}
+      {map && (
+        <React.Fragment>
+          <QueryHeader
+            placeholder="Query"
+            value={query}
+            onKeyUp={event =>
+              debouncedQuery((event.target as HTMLInputElement).value)
+            }
+          />
+          <MapView map={map} {...{ viewState, setViewState }} />
+        </React.Fragment>
+      )}
     </div>
   );
 };

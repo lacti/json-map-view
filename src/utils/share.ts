@@ -11,7 +11,7 @@ const getCurrentUrl = () => {
   return currentUrl;
 };
 
-export const buildShareUrl = <T>(state: T) => {
+const buildShareUrl = <T>(state: T) => {
   const currentUrl = getCurrentUrl();
   const hashIndex = currentUrl.indexOf("#");
   return (
@@ -21,10 +21,10 @@ export const buildShareUrl = <T>(state: T) => {
   );
 };
 
-export const gotoShareUrl = <T>(state: T) =>
+const gotoShareUrl = <T>(state: T) =>
   window.location.replace(buildShareUrl(state));
 
-export const getStateFromUrl = <T>(): T | null => {
+const getStateFromUrl = <T>(): T | null => {
   const currentUrl = getCurrentUrl();
   const hashIndex = currentUrl.indexOf("#");
   if (hashIndex < 0) {
@@ -40,4 +40,16 @@ export const getStateFromUrl = <T>(): T | null => {
     console.error(`Invalid state at URL`, error);
     return null;
   }
+};
+
+export const useStateFromUrl = <T>(): [
+  T | null,
+  (newValue: Partial<T> | null) => void
+] => {
+  const value = getStateFromUrl<T>();
+  return [
+    value,
+    (newValue: Partial<T> | null) =>
+      gotoShareUrl({ ...(value || {}), ...(newValue || {}) })
+  ];
 };

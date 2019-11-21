@@ -12,8 +12,8 @@ const NodeView: React.FC<{
     {Object.entries(model)
       .filter(([, nodeValue]) => typeof nodeValue !== "string")
       .sort(compare)
-      .map(([nodeKey, nodeValue]) => (
-        <li key={nodeKey}>
+      .map(([nodeKey, nodeValue], index) => (
+        <li key={`${index}_${nodeKey}`}>
           <NonTerminalNode
             nodeKey={nodeKey}
             nodeValue={nodeValue as IMapNode}
@@ -25,8 +25,8 @@ const NodeView: React.FC<{
     {Object.entries(model)
       .filter(([, nodeValue]) => typeof nodeValue === "string")
       .sort(compare)
-      .map(([nodeKey, nodeValue]) => (
-        <li key={nodeKey}>
+      .map(([nodeKey, nodeValue], index) => (
+        <li key={`${nodeKey}_${index}`}>
           <TerminalNode text={nodeKey} value={nodeValue as string} />
         </li>
       ))}
