@@ -1,0 +1,8 @@
+.vscode
+build
+node_modules
+.gitignore
+README.md
+*.log
+Dockerfile
+.dockerignore
